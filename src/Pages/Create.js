@@ -7,33 +7,53 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
+import { makeStyles } from "@material-ui/core";
 
+
+const useStyles = makeStyles({
+    field:{
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        marginTop: 20,
+    }
+})
 export default function Create() {
   const [errorTitle, setErrorTitle] = useState(false);
   const [errorDetails, setErrorDetails] = useState(false);
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
-  const [value, setValue] = useState("money");
+  const [category, setCategory] = useState("money");
+
+  let history = useHistory();
+  const classes = useStyles(); 
 
   const SubmitHandler = (event) => {
     event.preventDefault();
     setErrorTitle(false);
     setErrorDetails(false);
 
-    if (title == "") {
+    if (title === "") {
       setErrorTitle(true);
     }
-    if (details == "") {
+    if (details === "") {
       setErrorDetails(true);
     }
-    if (title && details !== "") {
-      console.log(title, details);
+    if (title && details) {
+      axios
+        .post("http://localhost:8000/notes", {
+          title,
+          details,
+          category
+        })
+        .then(history.push("/"));
     }
   };
 
   const HandleRadioChange = (e) => {
-    setValue(e.target.value);
-
+    setCategory(e.target.value);
   };
 
   return (
@@ -70,45 +90,45 @@ export default function Create() {
               setDetails(e.target.value);
             }}
           />
-          <FormControl style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "flex-start",
-              marginTop:20
-            }} 
-            color="primary">
-          <FormLabel >Note Category</FormLabel>
-          <RadioGroup
-         
-            value={value}
-            onChange={HandleRadioChange}
-          >
-            <FormControlLabel color="primary" value="money" control={<Radio color="primary" />}  label="Money"  />
-            <FormControlLabel value="todos" control={<Radio color="primary"/>} label="Todos" />
-            <FormControlLabel value="reminders" control={<Radio color="primary"/>} label="Reminders" />
-            <FormControlLabel value="work" control={<Radio color="primary"/>} label="work" />
-            
-          </RadioGroup>
-        </FormControl>
-          <Button
-            variant="contained"
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "flex-start",
-              marginTop:20
-            }}
+          <FormControl
+            className={classes.field}
             color="primary"
-            align="left"
+          >
+            <FormLabel>Note Category</FormLabel>
+            <RadioGroup value={category} onChange={HandleRadioChange}>
+              <FormControlLabel
+                color="primary"
+                value="money"
+                control={<Radio color="primary" />}
+                label="Money"
+              />
+              <FormControlLabel
+                value="todos"
+                control={<Radio color="primary" />}
+                label="Todos"
+              />
+              <FormControlLabel
+                value="reminders"
+                control={<Radio color="primary" />}
+                label="Reminders"
+              />
+              <FormControlLabel
+                value="work"
+                control={<Radio color="primary" />}
+                label="work"
+              />
+            </RadioGroup>
+          </FormControl>
+          <Button
+            className={classes.field}
+            variant="contained"
+            color="primary"
             endIcon={<ChevronRightIcon />}
             type="submit"
           >
             Submit
           </Button>
-          
         </form>
-      
-        
       </Container>
     </div>
   );
